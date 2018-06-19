@@ -1,0 +1,26 @@
+{
+    "name": "moss-language",
+    "displayName": "moss-language",
+    "description": "Moss extends yaml adding environment based selectors and interpolation",
+    "version": "0.0.1",
+    "publisher": "1e1f",
+    "engines": {
+        "vscode": "^1.24.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "moss",
+            "aliases": ["Moss", "moss"],
+            "extensions": [".moss"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "moss",
+            "scopeName": "source.moss",
+            "path": "./syntaxes/moss.tmLanguage.json"
+        }]
+    }
+}
