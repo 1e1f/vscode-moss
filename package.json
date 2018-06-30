@@ -2,6 +2,7 @@
     "name": "vscode-moss",
     "displayName": "vscode-moss",
     "description": "Moss extends yaml adding environment based selectors and interpolation",
+    "repository": "https://github.com/1e1f/vscode-moss.git",
     "version": "0.0.1",
     "publisher": "1e1f",
     "engines": {
