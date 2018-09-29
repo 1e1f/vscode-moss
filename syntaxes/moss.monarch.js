@@ -1,31 +1,101 @@
+const conf = {
+  comments: {
+    lineComment: '#'
+  },
+  brackets: [
+    ['${', '}'],
+    ['={', '}'],
+    ['{', '}'],
+    ['[', ']'],
+    ['(', ')']
+  ],
+  autoClosingPairs: [{
+      open: '${',
+      close: '}'
+    },
+    {
+      open: '={',
+      close: '}'
+    },
+    {
+      open: '[',
+      close: ']'
+    },
+    {
+      open: '(',
+      close: ')'
+    },
+    {
+      open: '"',
+      close: '"'
+    },
+    {
+      open: '\'',
+      close: '\''
+    },
+  ],
+  surroundingPairs: [{
+      open: '${',
+      close: '}'
+    },
+    {
+      open: '={',
+      close: '}'
+    },
+    {
+      open: '{',
+      close: '}'
+    },
+    {
+      open: '[',
+      close: ']'
+    },
+    {
+      open: '(',
+      close: ')'
+    },
+    {
+      open: '"',
+      close: '"'
+    },
+    {
+      open: '\'',
+      close: '\''
+    },
+  ],
+  folding: {
+    offSide: true
+  }
+};
+
+const keywords = ['true', 'True', 'TRUE', 'false', 'False', 'FALSE', 'null', 'Null', 'Null', '~'];
 
 return {
   tokenPostfix: '.moss',
 
   brackets: [{
-      token: 'delimiter.interpolate',
-      open: '${',
-      close: '}'
-    },
-    {
-      token: 'delimiter.mathjs',
-      open: '={',
-      close: '}'
-    },
-    {
-      token: 'delimiter.bracket',
-      open: '{',
-      close: '}'
-    },
-    {
-      token: 'delimiter.square',
-      open: '[',
-      close: ']'
-    },
+    token: 'delimiter.interpolate',
+    open: '${',
+    close: '}'
+  },
+  {
+    token: 'delimiter.explicitMathJS',
+    open: '={',
+    close: '}'
+  },
+  {
+    token: 'delimiter.bracket',
+    open: '{',
+    close: '}'
+  },
+  {
+    token: 'delimiter.square',
+    open: '[',
+    close: ']'
+  },
   ],
 
-  keywords: ['true', 'True', 'TRUE', 'false', 'False', 'FALSE', 'null', 'Null', 'Null', '~'],
-
+  keywords,
   numberInteger: /(?:0|[+-]?[0-9]+)/,
   numberFloat: /(?:0|[+-]?[0-9]+)(?:\.[0-9]+)?(?:e[-+][1-9][0-9]*)?/,
   numberOctal: /0o[0-7]+/,
@@ -36,184 +106,207 @@ return {
 
   escapes: /\\(?:[btnfr\\"']|[0-7][0-7]?|[0-3][0-7]{2})/,
 
+  mathjs_keywords: [
+    'boolean', 'break', 'byte', 'case', 'catch', 'char', 'class', 'const', 'continue', 'debugger',
+    'default', 'delete', 'do', 'double', 'else', 'enum', 'export', 'extends', 'false', 'final',
+    'finally', 'float', 'for', 'function', 'goto', 'if', 'implements', 'import', 'in',
+    'instanceof', 'int', 'interface', 'long', 'native', 'new', 'null', 'package', 'private',
+    'protected', 'public', 'return', 'short', 'static', 'super', 'switch', 'synchronized', 'this',
+    'throw', 'throws', 'transient', 'true', 'try', 'typeof', 'var', 'void', 'volatile', 'while',
+    'with'
+  ],
+
+  mathjs_builtins: [
+    'define', 'require', 'window', 'document', 'undefined'
+  ],
+
+  mathjs_operators: [
+    '=', '>', '<', '!', '~', '?', ':',
+    '==', '<=', '>=', '!=', '&&', '||', '++', '--',
+    '+', '-', '*', '/', '&', '|', '^', '%', '<<',
+    '>>', '>>>', '+=', '-=', '*=', '/=', '&=', '|=',
+    '^=', '%=', '<<=', '>>=', '>>>='
+  ],
+
+  // define our own brackets as '<' and '>' do not match in javascript
+  mathjs_brackets: [
+    ['(', ')', 'bracket.parenthesis'],
+    ['{', '}', 'bracket.curly'],
+    ['[', ']', 'bracket.square']
+  ],
+
+  // common regular expressions
+  mathjs_symbols: /[~!@#%\^&*-+=|\\:`<>.?\/]+/,
+  mathjs_escapes: /\\(?:[btnfr\\"']|[0-7][0-7]?|[0-3][0-7]{2})/,
+  mathjs_exponent: /[eE][\-+]?[0-9]+/,
+
+  mathjs_regexpctl: /[(){}\[\]\$\^|\-*+?\.]/,
+  mathjs_regexpesc: /\\(?:[bBdDfnrstvwWn0\\\/]|@mathjs_regexpctl|c[A-Z]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4})/,
+
   tokenizer: {
     root: [{
-        include: '@whitespace'
-      },
-      {
-        include: '@comment'
-      },
+      include: '@whitespace'
+    },
+    {
+      include: '@comment'
+    },
 
-      // Directive
-      [/%[^ ]+.*$/, 'meta.directive'],
+    // Directive
+    [/%[^ ]+.*$/, 'meta.directive'],
 
-      // Document Markers
-      [/---/, 'operators.directivesEnd'],
-      [/\.{3}/, 'operators.documentEnd'],
+    // Document Markers
+    [/---/, 'operators.directivesEnd'],
+    [/\.{3}/, 'operators.documentEnd'],
 
-      // Block Structure Indicators
-      [/[-?:](?= )/, 'operators'],
+    // Block Structure Indicators
+    [/[-?:](?= )/, 'operators'],
 
-      {
-        include: '@anchor'
-      },
-      {
-        include: '@tagHandle'
-      },
-      {
-        include: '@flowCollections'
-      },
-      {
-        include: '@blockStyle'
-      },
+    {
+      include: '@anchor'
+    },
+    {
+      include: '@tagHandle'
+    },
+    {
+      include: '@flowCollections'
+    },
+    {
+      include: '@blockStyle'
+    },
+    // Numbers
+    [/@numberInteger(?![ \t]*\S+)/, 'number'],
+    [/@numberFloat(?![ \t]*\S+)/, 'number.float'],
+    [/@numberOctal(?![ \t]*\S+)/, 'number.octal'],
+    [/@numberHex(?![ \t]*\S+)/, 'number.hex'],
+    [/@numberInfinity(?![ \t]*\S+)/, 'number.infinity'],
+    [/@numberNaN(?![ \t]*\S+)/, 'number.nan'],
+    [/@numberDate(?![ \t]*\S+)/, 'number.date'],
+    // Key:Value pair
 
-      // Numbers
-      [/@numberInteger(?![ \t]*\S+)/, 'number'],
-      [/@numberFloat(?![ \t]*\S+)/, 'number.float'],
-      [/@numberOctal(?![ \t]*\S+)/, 'number.octal'],
-      [/@numberHex(?![ \t]*\S+)/, 'number.hex'],
-      [/@numberInfinity(?![ \t]*\S+)/, 'number.infinity'],
-      [/@numberNaN(?![ \t]*\S+)/, 'number.nan'],
-      [/@numberDate(?![ \t]*\S+)/, 'number.date'],
-
-      // Key:Value pair
-      [/(".*?"|'.*?'|.*?)([ \t]*)(:)( |$)/, ['type', 'white', 'operators', 'white']],
-
-      {
-        include: '@flowScalars'
-      },
-      {
-        include: '@flowFunctions'
-      },
-
-      // String nodes
-      [/.+$/, {
-        cases: {
-          '@keywords': 'keyword',
-          '@default': 'string'
-        }
-      }]
-    ],
-
-    // Flow Collection: Flow Mapping
-    object: [{
-        include: '@whitespace'
-      },
-      {
-        include: '@comment'
-      },
-
-      // Flow Mapping termination
-      [/\}/, '@brackets', '@pop'],
-
-      // Flow Mapping delimiter
-      [/,/, 'delimiter.comma'],
-
-      // Flow Mapping Key:Value delimiter
-      [/:(?= )/, 'operators'],
-
-      // Flow Mapping Key:Value key
-      [/(?:".*?"|'.*?'|[^,\{\[]+?)(?=: )/, 'type'],
-
-      // Start Flow Style
-      {
-        include: '@flowCollections'
-      },
-      {
-        include: '@flowScalars'
-      },
-      {
-        include: '@flowFunctions'
-      },
-
-      // Scalar Data types
-      {
-        include: '@tagHandle'
-      },
-      {
-        include: '@anchor'
-      },
-      {
-        include: '@flowNumber'
-      },
-
-      // Other value (keyword or string)
-      [/[^\},]+/, {
-        cases: {
-          '@keywords': 'keyword',
-          '@default': 'string'
-        }
-      }]
-    ],
-
-    interpolate: [
-      {
-        include: '@flowNumber'
-      },
-      // Other value (keyword or string)
-      [/[^\},]+/, {
-        cases: {
-          '@keywords': 'keyword',
-          '@default': 'string'
-        }
-      }],
-      [/\}/, '@brackets', '@pop']
-    ],
-
-    mathjs: [
-      // Flow Mapping termination
-      [/\}/, '@brackets', '@pop'],
-      // Scalar Data types
-      {
-        include: '@flowNumber'
+    [/(".*?"|'.*?'|.*?)([ \t]*)(:)( |$)/, [{
+      cases: {
+        '.*<>?': 'number',
+        '.*>': 'key',
+        '\\$.*': 'key',
+        '[=|+].*': 'key',
+        '-[a-z]': 'key',
+        '@default': 'type'
       }
+    }, 'white', 'operators', 'white']],
+    {
+      include: '@flowScalars'
+    },
+    { include: '@flowFunctions' },
+    [keywords.join('|'), 'keyword'],
+    [/\$.*/, 'key'],
+    [/./, 'string']
     ],
 
-    // Flow Collection: Flow Sequence
+
+
+
+
+    ////
+    // Flow Collection: Flow Mapping
+    ////
+    object: [{
+      include: '@whitespace'
+    },
+    {
+      include: '@comment'
+    },
+
+    // Flow Mapping termination
+    [/\}/, '@brackets', '@pop'],
+
+    // Flow Mapping delimiter
+    [/,/, 'delimiter.comma'],
+
+    // Flow Mapping Key:Value delimiter
+    [/:(?= )/, 'operators'],
+
+    // Flow Mapping Key:Value key
+    [/(?:".*?"|'.*?'|[^,\{\[]+?)(?=: )/, {
+      cases: {
+        '.*<>?': 'number',
+        '.*>': 'key',
+        '\\$.*': 'key',
+        '@default': 'type'
+      }
+    }],
+
+    // Start Flow Style
+    {
+      include: '@flowCollections'
+    },
+    {
+      include: '@flowScalars'
+    },
+    {
+      include: '@flowFunctions'
+    },
+    // Scalar Data types
+    {
+      include: '@tagHandle'
+    },
+    {
+      include: '@anchor'
+    },
+    {
+      include: '@flowNumber'
+    },
+    [keywords.join('|'), 'keyword'],
+    [/./, 'string']
+    ],
+
+
+
+
+    ////
+    // Flow Sequence: Flow Mapping
+    ////
+
     array: [{
-        include: '@whitespace'
-      },
-      {
-        include: '@comment'
-      },
+      include: '@whitespace'
+    },
+    {
+      include: '@comment'
+    },
 
-      // Flow Sequence termination
-      [/\]/, '@brackets', '@pop'],
+    // Flow Sequence termination
+    [/\]/, '@brackets', '@pop'],
 
-      // Flow Sequence delimiter
-      [/,/, 'delimiter.comma'],
+    // Flow Sequence delimiter
+    [/,/, 'delimiter.comma'],
 
-      // Start Flow Style
-      {
-        include: '@flowCollections'
-      },
-      {
-        include: '@flowScalars'
-      },
+    // Start Flow Style
+    {
+      include: '@flowCollections'
+    },
+    {
+      include: '@flowScalars'
+    },
+    {
+      include: '@flowFunctions'
+    },
+    // Scalar Data types
+    {
+      include: '@tagHandle'
+    },
+    {
+      include: '@anchor'
+    },
+    {
+      include: '@flowNumber'
+    },
+    [/./, 'string']
 
-      // Scalar Data types
-      {
-        include: '@tagHandle'
-      },
-      {
-        include: '@anchor'
-      },
-      {
-        include: '@flowNumber'
-      },
-
-      // Other value (keyword or string)
-      [/[^\],]+/, {
-        cases: {
-          '@keywords': 'keyword',
-          '@default': 'string'
-        }
-      }]
     ],
 
     // Flow Scalars (quoted strings)
     string: [
-      [/[^\\"']+/, 'string'],
+      [/\${/, '@brackets', '@explicitInterpolate'],
+      [/={/, '@brackets', '@explicitMathJS'],
       [/@escapes/, 'string.escape'],
       [/\\./, 'string.escape.invalid'],
       [/["']/, {
@@ -224,7 +317,8 @@ return {
           },
           '@default': 'string'
         }
-      }]
+      }],
+      [/./, 'string']
     ],
 
     // First line of a Block Style
@@ -261,11 +355,46 @@ return {
       [/\{/, '@brackets', '@object']
     ],
 
-    flowFunctions: [
-      [/\${/, '@brackets', '@interpolate'],
-      [/={/, '@brackets', '@mathjs']
+    // MOSS
+    explicitInterpolate: [
+      {
+        include: '@inStringFunctions'
+      },
+      [/[^}]/, 'variable'],
+      [/\}/, '@brackets', '@pop'],
     ],
 
+    explicitMathJS: [
+      // Flow Mapping termination
+      // Scalar Data types
+      [/\}/, '@brackets', '@pop'],
+      [/\${/, '@brackets', '@explicitInterpolate'],
+      {
+        include: '@mathjs'
+      }
+    ],
+
+    inStringFunctions: [
+      [/\${/, '@brackets', '@explicitInterpolate'],
+      [/={/, '@brackets', '@explicitMathJS'],
+    ],
+
+    implicitMathJS: [
+      [/^( *).+$/, '@rematch', '@popall'],
+      [/\${/, '@brackets', '@explicitInterpolate'],
+      {
+        include: '@mathjs'
+      }
+    ],
+
+    flowFunctions: [{
+      include: '@inStringFunctions'
+    },
+    [/=/, {
+      token: 'bracket',
+      next: '@implicitMathJS',
+    }],
+    ],
     // Start Flow Scalars (quoted strings)
     flowScalars: [
       [/"/, 'string', '@string."'],
@@ -294,6 +423,90 @@ return {
 
     anchor: [
       [/[&*][^ ]+/, 'namespace']
+    ],
+
+    mathjs: [
+      [/([a-zA-Z_\$][\w\$]*)(\s*)(:?)/, {
+        cases: {
+          '$1@mathjs_keywords': ['keyword', 'white', 'delimiter'],
+          '$3': ['key.identifier', 'white', 'delimiter'], // followed by :
+          '$1@mathjs_builtins': ['predefined.identifier', 'white', 'delimiter'],
+          '@default': ['variable', 'white', 'delimiter']
+        }
+      }],
+
+
+      // regular expression: ensure it is terminated before beginning (otherwise it is an opeator)
+      [/\/(?=([^\\\/]|\\.)+\/)/, {
+        token: 'regexp.slash',
+        bracket: '@open',
+        next: '@mathjs_regexp'
+      }],
+
+      // delimiters and operators
+      [/[{}()\[\]]/, '@mathjs_brackets'],
+      [/[;,.]/, 'delimiter'],
+      [/@mathjs_symbols/, {
+        cases: {
+          '@mathjs_operators': 'operator',
+          '@default': ''
+        }
+      }],
+
+      // numbers
+      [/\d+\.\d*(@mathjs_exponent)?/, 'number.float'],
+      [/\.\d+(@mathjs_exponent)?/, 'number.float'],
+      [/\d+@mathjs_exponent/, 'number.float'],
+      [/0[xX][\da-fA-F]+/, 'number.hex'],
+      [/0[0-7]+/, 'number.octal'],
+      [/\d+/, 'number'],
+
+      // strings: recover on non-terminated strings
+      [/"([^"\\]|\\.)*$/, 'string.invalid'], // non-teminated string
+      [/'([^'\\]|\\.)*$/, 'string.invalid'], // non-teminated string
+      [/"/, 'string', '@string."'],
+      [/'/, 'string', '@string.\''],
+    ],
+
+    mathjs_whitespace: [
+      [/[ \t\r\n]+/, 'white'],
+      [/\/\*/, 'comment', '@comment'],
+      [/\/\/.*$/, 'comment'],
+    ],
+
+    mathjs_comment: [
+      [/[^\/*]+/, 'comment'],
+      // [/\/\*/, 'comment', '@push' ],    // nested comment not allowed :-(
+      [/\/\*/, 'comment.invalid'],
+      ["\\*/", 'comment', '@pop'],
+      [/[\/*]/, 'comment']
+    ],
+
+    // We match regular expression quite precisely
+    mathjs_regexp: [
+      [/(\{)(\d+(?:,\d*)?)(\})/, ['@mathjs_brackets.regexp.escape.control', 'regexp.escape.control', '@mathjs_brackets.regexp.escape.control']],
+      [/(\[)(\^?)(?=(?:[^\]\\\/]|\\.)+)/, ['@mathjs_brackets.regexp.escape.control', {
+        token: 'regexp.escape.control',
+        next: '@mathjs_regexrange'
+      }]],
+      [/(\()(\?:|\?=|\?!)/, ['@mathjs_brackets.regexp.escape.control', 'regexp.escape.control']],
+      [/[()]/, '@mathjs_brackets.regexp.escape.control'],
+      [/@mathjs_regexpctl/, 'regexp.escape.control'],
+      [/[^\\\/]/, 'regexp'],
+      [/@mathjs_regexpesc/, 'regexp.escape'],
+      [/\\\./, 'regexp.invalid'],
+      ['/', {
+        token: 'regexp.slash',
+        bracket: '@close'
+      }, '@pop'],
+    ],
+
+    mathjs_regexrange: [
+      [/-/, 'regexp.escape.control'],
+      [/\^/, 'regexp.invalid'],
+      [/@mathjs_regexpesc/, 'regexp.escape'],
+      [/[^\]]/, 'regexp'],
+      [/\]/, '@mathjs_brackets.regexp.escape.control', '@pop'],
     ]
   }
 };

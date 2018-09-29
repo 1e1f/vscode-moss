@@ -1,0 +1,15 @@
+blockMapping:
+  lostOfInterpolate: ${a${bisa${c}}}
+  mathjs: =r + a + 3
+  mathWithNestedInterpolate: ={${b} + ${a} + 3}
+  stringInterpolate: rgb(${rr}, ${g}, ${bb})
+function<:
+  lazyDirective>: 
+    flowMapping: { a: c, $b: $a, c<: a${x} }
+  blockSequence:
+  - $interpolatedKey: true
+  - flowSequence: [ "tis${x}", "x={5 + 9}" ]
+  cascadingSelectors:
+    =: d
+    +a: a
+    -b: c
